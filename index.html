@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños, Don Hector!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: #0d1117;
+            color: #c9d1d9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: auto;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: #161b22;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .terminal-header {
+            background: #21262d;
+            padding: 10px;
+            border-radius: 5px 5px 0 0;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        .terminal-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27ca3f; }
+        
+        .terminal-title {
+            margin-left: 15px;
+            font-size: 14px;
+            color: #8b949e;
+        }
+        
+        .terminal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        
+        .prompt {
+            color: #58a6ff;
+            margin-right: 10px;
+        }
+        
+        .command {
+            color: #7ee787;
+        }
+        
+        .output {
+            margin: 15px 0;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #c9d1d9;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .file-system {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .file {
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .file:hover {
+            transform: scale(1.1);
+        }
+        
+        .file-icon {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .file-name {
+            font-size: 12px;
+            color: #8b949e;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .message {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 3px solid #58a6ff;
+        }
+        
+        .birthday-cake {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 40px;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .signature {
+            text-align: right;
+            margin-top: 20px;
+            font-style: italic;
+            color: #8b949e;
+        }
+        
+        /* Estilos para la barra de desplazamiento */
+        .terminal-body::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-track {
+            background: #0d1117;
+            border-radius: 5px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: #58a6ff;
+            border-radius: 5px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb:hover {
+            background: #3d8bf0;
+        }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #8b949e;
+            font-size: 12px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="terminal-header">
+            <div class="terminal-buttons">
+                <div class="terminal-button red"></div>
+                <div class="terminal-button yellow"></div>
+                <div class="terminal-button green"></div>
+            </div>
+            <div class="terminal-title">birthday_terminal.exe</div>
+        </div>
+        
+        <div class="terminal-body">
+            <div id="terminal-content">
+                <div class="output">
+                    <span class="prompt">user@devos-pc:~$</span> <span class="command">cd /birthday/memories</span>
+                </div>
+                <div class="output">
+                    <span class="prompt">user@devos-pc:~/birthday/memories$</span> <span class="command">ls -la</span>
+                </div>
+                <div class="output">
+                    Creando archivos de buenos momentos...<br>
+                    <span id="progress-bar"></span>
+                </div>
+                <div id="file-system" class="file-system hidden">
+                    <!-- Los archivos se generarán dinámicamente -->
+                </div>
+                <div id="final-message" class="hidden">
+                    <div class="birthday-cake">🎂</div>
+                    <div class="message">
+                        <p>¡Feliz cumpleaños Señor Hector! 🎉</p>
+                        <p>Hoy es un dia muy especial porque hoy nacio el coleccionista de pokemones más apacionado, el papá de faco y el mejor amigo que alguien pudo haber pedido, gracias por siempre defender nuetsro TDAH y por hacerme segunda en cada locura.</p>
+                        <p>Que este nuevo ciclo de vida venga cargado de commits exitosos, deployments sin errores y código limpio. ¡Y por supuesto, muchas cartas cool de pokemon!</p>
+                        <br>
+                        <p>Gracias por:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Enseñarme el mundo de las cartas pokemon</li>
+                            <li>Abrir cartas sin morir en el intento</li>
+                            <li>Ser tan cool!!!</li>
+                        </ul>
+                        <br>
+                        <p>Hoy celebramos no solo tu cumpleaños, sino todas las cartas cool que han salido de pokemon, todos los niveles que has pasado en tus video juegos y tu nueva etapa como papá.</p>
+                        <br>
+                        <p>Espero que este nuevo año de vida te traiga:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Puros 10 PSA</li>
+                            <li>Muchas nuevas aventuras en la frikiplaza</li>
+                            <li>Muchas mas figuritas poderosas</li>
+                            <li>Y claro MUY MUY poco Bulk</li>
+                        </ul>
+                    </div>
+                    <div class="signature">
+                        <p>¡Felicidades!</p>
+                        <p>Isa y Flor</p>
+                    </div>
+                </div>
+                <div class="output">
+                    <span class="prompt">user@devos-pc:~/birthday/memories$</span> <span id="command-text"></span><span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">Desplázate para ver más contenido ↓</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const terminalContent = document.getElementById('terminal-content');
+            const fileSystem = document.getElementById('file-system');
+            const finalMessage = document.getElementById('final-message');
+            const commandText = document.getElementById('command-text');
+            const progressBar = document.getElementById('progress-bar');
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            
+            // Archivos de buenos momentos
+            const memoryFiles = [
+                { icon: '💻', name: 'subastas.js', description: 'puras subastas exitosas' },
+                { icon: '☕', name: 'airochino.py', description: 'el mejor cafe del condado' },
+                { icon: '🐛', name: 'raquetazo.java', description: 'puro toke toke' },
+                { icon: '🚀', name: 'nuevo_proyectos.sh', description: 'que será lo que sigue?' },
+                { icon: '🎮', name: 'regrego_en_5_min.exe', description: 'Se va a jugar y desaparece 2 horas' },
+                { icon: '🍕', name: 'coder_pizza.nom', description: 'que nunca nos falta la mejor comida del mundo' },
+                { icon: '😂', name: 'memes_dev.meme', description: 'Arriba veracruz' },
+                { icon: '🏆', name: 'PSA_10.vct', description: 'las mejores cartas de pokemon' },
+                { icon: '🌙', name: 'nocturno.c', description: 'Por mas noches sin dormir cuidando a Faco' },
+                { icon: '🤝', name: 'deals.git', description: 'Puros buenos tratos en intercambio de cartas' },
+                { icon: '💡', name: 'idea_genial.md', description: 'Abrir las cajas de las cartas abajo de 8 jajaja' },
+                { icon: '🎉', name: 'celebración.exe', description: 'Por muchos cumpleaños más!!!!' }
+            ];
+            
+            let currentStep = 0;
+            const steps = [
+                { text: 'ls -la', delay: 1000 },
+                { text: 'creating_memories.sh', delay: 2000 },
+                { text: 'cat felicitacion.txt', delay: 1000 }
+            ];
+            
+            function simulateTyping(text, element, delay, callback) {
+                let i = 0;
+                element.textContent = '';
+                
+                function type() {
+                    if (i < text.length) {
+                        element.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(type, delay);
+                    } else if (callback) {
+                        setTimeout(callback, 500);
+                    }
+                }
+                
+                type();
+            }
+            
+            function showProgressBar() {
+                let progress = '';
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        progress += '█';
+                        progressBar.textContent = '[' + progress + '] ' + (i+1)*5 + '%';
+                        
+                        if (i === 19) {
+                            // Mostrar sistema de archivos
+                            fileSystem.classList.remove('hidden');
+                            
+                            // Generar archivos
+                            memoryFiles.forEach((file, index) => {
+                                setTimeout(() => {
+                                    const fileElement = document.createElement('div');
+                                    fileElement.className = 'file';
+                                    fileElement.innerHTML = `
+                                        <div class="file-icon">${file.icon}</div>
+                                        <div class="file-name">${file.name}</div>
+                                    `;
+                                    
+                                    fileElement.addEventListener('click', () => {
+                                        alert(file.description);
+                                    });
+                                    
+                                    fileSystem.appendChild(fileElement);
+                                    
+                                    if (index === memoryFiles.length - 1) {
+                                        setTimeout(nextStep, 1000);
+                                    }
+                                }, index * 200);
+                            });
+                        }
+                    }, i * 100);
+                }
+            }
+            
+            function nextStep() {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    
+                    if (currentStep === 1) {
+                        // Paso especial para crear archivos
+                        showProgressBar();
+                    } else if (currentStep === 2) {
+                        // Mostrar mensaje final
+                        finalMessage.classList.remove('hidden');
+                        
+                        // Ocultar el indicador de scroll después de un tiempo
+                        setTimeout(() => {
+                            scrollIndicator.style.display = 'none';
+                        }, 5000);
+                    }
+                    
+                    simulateTyping(step.text, commandText, 100, () => {
+                        currentStep++;
+                        if (currentStep < steps.length) {
+                            setTimeout(nextStep, step.delay);
+                        }
+                    });
+                }
+            }
+            
+            // Iniciar la simulación después de un breve retraso
+            setTimeout(() => {
+                nextStep();
+            }, 1000);
+            
+            // Ocultar el indicador de scroll cuando el usuario se desplace
+            const terminalBody = document.querySelector('.terminal-body');
+            terminalBody.addEventListener('scroll', function() {
+                scrollIndicator.style.opacity = '0';
+                setTimeout(() => {
+                    scrollIndicator.style.display = 'none';
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>
